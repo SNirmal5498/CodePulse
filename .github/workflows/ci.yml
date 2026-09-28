@@ -13,8 +13,8 @@ on:
       - develop
 
 jobs:
-  backend:
-    name: Backend Build & Test
+  authentication-ci:
+    name: Authentication CI
     runs-on: ubuntu-latest
 
     services:
@@ -32,19 +32,18 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
-    defaults:
-      run:
-        working-directory: server
-
     env:
       DB_USERNAME: codepulse_user
       DB_PASSWORD: codepulse_ci_password
       JWT_SECRET: CodePulse_CI_JWT_Secret_2026_TestOnly
 
     steps:
-      - name: Checkout code
+
+      # 1. Checkout
+      - name: Checkout
         uses: actions/checkout@v4
 
+      # 2. Setup Java
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
@@ -52,21 +51,17 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Build and test backend
-        run: mvn clean verify
+      # 3. Backend Build
+      - name: Backend Build
+        working-directory: server
+        run: mvn clean package -DskipTests
 
-  frontend:
-    name: Frontend Build
-    runs-on: ubuntu-latest
+      # 4. Backend Test
+      - name: Backend Test
+        working-directory: server
+        run: mvn test
 
-    defaults:
-      run:
-        working-directory: client
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      # 5. Setup Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -74,8 +69,17 @@ jobs:
           cache: npm
           cache-dependency-path: client/package-lock.json
 
-      - name: Install dependencies
+      # 6. Frontend Install
+      - name: Frontend Install Dependencies
+        working-directory: client
         run: npm ci
 
-      - name: Build frontend
+      # 7. Frontend Test
+      - name: Frontend Test
+        working-directory: client
+        run: npm test -- --run
+
+      # 8. Frontend Build
+      - name: Frontend Build
+        working-directory: client
         run: npm run build
