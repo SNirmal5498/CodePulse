@@ -154,3 +154,33 @@ jobs:
       - name: Build frontend
         working-directory: client
         run: npm run build
+
+  sonarcloud:
+    name: SonarQube Cloud
+    needs: frontend-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Build backend for SonarQube
+        working-directory: server
+        env:
+          DB_USERNAME: codepulse_user
+          DB_PASSWORD: codepulse_ci_password
+          JWT_SECRET: CodePulse_CI_JWT_Secret_2026_TestOnly
+        run: mvn clean package -DskipTests
+
+      - name: SonarQube Cloud Scan
+        uses: SonarSource/sonarqube-scan-action@v8
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
