@@ -155,6 +155,7 @@ jobs:
         working-directory: client
         run: npm run build
 
+
   sonarcloud:
     name: SonarQube Cloud
     needs: frontend-build
@@ -172,13 +173,28 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Build backend for SonarQube
+      - name: Build backend and generate coverage
         working-directory: server
         env:
           DB_USERNAME: codepulse_user
           DB_PASSWORD: codepulse_ci_password
           JWT_SECRET: CodePulse_CI_JWT_Secret_2026_TestOnly
-        run: mvn clean package -DskipTests
+        run: mvn clean test
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Run frontend tests with coverage
+        working-directory: client
+        run: npm test -- --run --coverage
 
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarqube-scan-action@v8
