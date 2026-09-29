@@ -38,7 +38,6 @@ function Register() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4">
-
       <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
 
         <h1 className="text-3xl font-bold">
@@ -55,11 +54,15 @@ function Register() {
         >
 
           <div>
-            <label className="text-sm text-slate-300">
+            <label
+              htmlFor="name"
+              className="text-sm text-slate-300"
+            >
               Name
             </label>
 
             <input
+              id="name"
               type="text"
               name="name"
               value={formData.name}
@@ -71,11 +74,15 @@ function Register() {
           </div>
 
           <div>
-            <label className="text-sm text-slate-300">
+            <label
+              htmlFor="email"
+              className="text-sm text-slate-300"
+            >
               Email
             </label>
 
             <input
+              id="email"
               type="email"
               name="email"
               value={formData.email}
@@ -87,11 +94,15 @@ function Register() {
           </div>
 
           <div>
-            <label className="text-sm text-slate-300">
+            <label
+              htmlFor="password"
+              className="text-sm text-slate-300"
+            >
               Password
             </label>
 
             <input
+              id="password"
               type="password"
               name="password"
               value={formData.password}
@@ -124,7 +135,6 @@ function Register() {
         )}
 
       </div>
-
     </div>
   );
 }
