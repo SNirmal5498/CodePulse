@@ -1,6 +1,6 @@
 package com.codepulse.server.security;
 
-import com.codepulse.server.entity.User;
+import com.codepulse.server.model.User;
 import com.codepulse.server.repository.UserRepository;
 
 import jakarta.servlet.FilterChain;
