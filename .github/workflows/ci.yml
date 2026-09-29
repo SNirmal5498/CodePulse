@@ -161,7 +161,28 @@ jobs:
     needs: frontend-build
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: codepulse
+          POSTGRES_USER: codepulse_user
+          POSTGRES_PASSWORD: codepulse_ci_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U codepulse_user -d codepulse"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DB_USERNAME: codepulse_user
+      DB_PASSWORD: codepulse_ci_password
+      JWT_SECRET: CodePulse_CI_JWT_Secret_2026_TestOnly
+
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -175,10 +196,6 @@ jobs:
 
       - name: Build backend and generate coverage
         working-directory: server
-        env:
-          DB_USERNAME: codepulse_user
-          DB_PASSWORD: codepulse_ci_password
-          JWT_SECRET: CodePulse_CI_JWT_Secret_2026_TestOnly
         run: mvn clean test
 
       - name: Set up Node.js
