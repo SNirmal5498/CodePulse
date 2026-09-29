@@ -1,16 +1,43 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 import ProtectedRoute from "./ProtectedRoute";
+import { useProfile } from "../hooks/useProfile";
+
+vi.mock("../hooks/useProfile");
 
 describe("ProtectedRoute", () => {
 
-  beforeEach(() => {
-    localStorage.clear();
+  it("shows loading state while checking authentication", () => {
+    useProfile.mockReturnValue({
+      isLoading: true,
+      isError: false,
+    });
+
+    render(
+      <MemoryRouter>
+        <ProtectedRoute>
+          <h1>Dashboard</h1>
+        </ProtectedRoute>
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByText("Checking authentication...")
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText("Dashboard")
+    ).not.toBeInTheDocument();
   });
 
-  it("redirects to login when token is missing", () => {
+  it("redirects to login when authentication fails", () => {
+    useProfile.mockReturnValue({
+      isLoading: false,
+      isError: true,
+    });
+
     render(
       <MemoryRouter initialEntries={["/"]}>
         <ProtectedRoute>
@@ -19,11 +46,16 @@ describe("ProtectedRoute", () => {
       </MemoryRouter>
     );
 
-    expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Dashboard")
+    ).not.toBeInTheDocument();
   });
 
-  it("renders protected content when token exists", () => {
-    localStorage.setItem("token", "test-jwt-token");
+  it("renders protected content when authentication succeeds", () => {
+    useProfile.mockReturnValue({
+      isLoading: false,
+      isError: false,
+    });
 
     render(
       <MemoryRouter initialEntries={["/"]}>
@@ -33,7 +65,8 @@ describe("ProtectedRoute", () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    expect(
+      screen.getByText("Dashboard")
+    ).toBeInTheDocument();
   });
-
 });

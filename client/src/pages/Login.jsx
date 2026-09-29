@@ -22,9 +22,7 @@ function Login() {
     setError("");
 
     try {
-      const data = await loginUser(formData);
-
-      localStorage.setItem("token", data.token);
+      await loginUser(formData);
 
       window.location.href = "/";
     } catch (err) {
@@ -54,11 +52,15 @@ function Login() {
         >
 
           <div>
-            <label className="text-sm text-slate-300">
+            <label
+              htmlFor="email"
+              className="text-sm text-slate-300"
+            >
               Email
             </label>
 
             <input
+              id="email"
               type="email"
               name="email"
               value={formData.email}
@@ -70,11 +72,15 @@ function Login() {
           </div>
 
           <div>
-            <label className="text-sm text-slate-300">
+            <label
+              htmlFor="password"
+              className="text-sm text-slate-300"
+            >
               Password
             </label>
 
             <input
+              id="password"
               type="password"
               name="password"
               value={formData.password}

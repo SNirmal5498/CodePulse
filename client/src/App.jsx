@@ -4,6 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { useProfile } from "./hooks/useProfile";
+import { logoutUser } from "./api/authApi";
 
 function Home() {
   const { data, isLoading, isError } = useProfile();
@@ -43,9 +44,13 @@ function Home() {
           </h1>
 
           <button
-            onClick={() => {
-              localStorage.removeItem("token");
-              window.location.href = "/login";
+            onClick={async () => {
+            try {
+            await logoutUser();
+            window.location.href = "/login";
+            } catch (err) {
+              console.error("Logout failed", err);
+            }
             }}
             className="rounded-lg bg-red-600 px-4 py-2 font-semibold hover:bg-red-500"
           >
